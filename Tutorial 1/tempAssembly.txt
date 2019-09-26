@@ -1,0 +1,82 @@
+.data                   ; start of a data section
+public  g               ; export variable g
+g       DWORD   4       ; declare global variable g initialised to 4
+.code                   ; start of a code section
+
+;int min(int a, int b, int c)
+
+min:    push ebp        ;       push frame pointer
+        mov ebp, esp    ;       update ebp
+
+        mov eax, [epb+4];       int v = a
+        cmp [epb+8], eax;       ;if(b<v){
+        jge notif1
+        mov eax, [epb+8]        ;v = b
+notif1: cmp [epb+12], eax;      ;if(c<v){
+        jge notif2
+        mov eax, [epb+12]       ;v=c
+notif2: mov esp, ebp            ;restore esp
+        pop ebp                 ;restore ebp
+        ret 0                   ;return
+
+;int p(int i, int j, int k, int l)
+
+p:      push ebp        ;       push frame pointer
+        mov ebp, esp    ;       update ebp
+
+        push [ebp+12]   ;       push j
+        push [ebp+8]    ;       push i
+        push g          ;       push g   
+        call min        ;       min(g, i, j)
+        add esp, 12     ;       remove parametres from stack
+
+        push [ebp+20]   ;       push l
+        push [ebp+16]   ;       push k
+        push [eax]      ;       push min(g, i, j)
+        call min        ;       min(min(g, i, j), k, l);
+        add esp, 12     ;       remove parametres from stack
+
+        mov esp, ebp    ;       restore esp
+        pop ebp         ;       restore ebp
+        ret 0           ;       return
+
+; int gcd(int a, int b)
+
+gcd:    push epb        ;       push frame pointer
+        mov ebp, esp    ;       update epb
+
+        cmp [ebp+12], 0 ;       if(b==0)
+        jne noteq
+        mov eax, [ebp+8];       return a
+        j endfunc
+
+noteq:  mov eax, [ebp+8]
+        cdq 
+        idiv [ebp+12]   ;
+        push eax
+        push [ebp+12]   ;
+        call gcd        ;
+        add esp, 8      ;
+
+endfunc:mov esp, ebp
+        pop ebp;
+        ret 0;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
